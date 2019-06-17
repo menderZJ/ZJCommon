@@ -1,0 +1,1 @@
+This is a directory of view£¬mostly£¬those files's suffix is *.html or *.htm.
