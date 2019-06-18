@@ -43,12 +43,11 @@ var ZJCommon={
 	}()),
 	/**
 	 * @property {double}  random 
-	 * @description 随机数
+	 * @description 提供一些随机数
 	 */
 	random:(function(){
 		setInterval(function(){ZJCommon.random=Math.random();},1);
 	}()),
-	
 	/**
 	 * @property {String} validate 验证类
 	 * @description 验证类
@@ -130,13 +129,13 @@ var ZJCommon={
 	 * @return {null} null
 	 */
 	init:
-	function(){	
+	function(callfun){	
 	//注意，以下初始化运行的函数相互具有依懒性，如非必要，请勿调整运行顺序或者删除某项函数的运行
 	this._autoload();//自动加载框架文件、相关控制器、数据模型js文件
 	this._getFileName();//存入文件全名
 	this._getFileSuffix();//存入文件后缀
 	this._getFileNoSuffix();//存入文件名，不带后缀
-	this._getFilePath();//存入文件路径
+	this._getFilePath();//存入文件路径	
 	},
 	/**
 	 * @method pushScript
@@ -160,7 +159,7 @@ var ZJCommon={
 		jsDomObj.type='text/javascript';
 		jsDomObj.src=jsPath+"?"+Math.random();
 		if(this.jsArr.isInArrayByName(jsObj.name)) {return false;}			
-		jsDomObj.addEventListener(continer,function(){
+		jsDomObj.addEventListener('load',function(){
 		ZJCommon.jsArr.push(jsObj); //载入完成后将js文档信息压如ZJCommon.jsArr树	.
 		});	
 				
@@ -208,40 +207,7 @@ var ZJCommon={
 		}
 	
 		
-	},
-	/**
-	 * @method getParams
-	 * @description  获得get参数
-	 * @return {Array}  返回get参数的JSON数据
-	 * ps：此功能已通过闭包载入到url_params
-	 */
-	//---以下废弃
-	/*
-	_getParams:function(){
-		var r=this.url_params;
-		
-		var p=this.url.search.substr(1).split('&');		
-		p.forEach(function(a){
-			var t=a.split('=');	
-			// var tr={};
-			// 	if(t.length==1) {
-			// 		tr[t[0]]='';
-			// 		r.push(tr);
-			// 		}
-			// 	else{
-			// 		tr[t[0]]=t[1];
-			// 		 r.push(tr);									
-			// 		}
-				if(t.length==1) {
-					r[t[0]]='';
-					}
-					else{
-					r[t[0]]=t[1];
-					}
-			})
-		//return r;
-	},
-	*/
+	},	
 	/**
 	 * @method redirect
 	 * @description  跳转到指定地址，并按需给出提示
@@ -273,10 +239,22 @@ var ZJCommon={
 		ZJCommon.pushScript('jQuery',"js/common/jquery2.1.js","加载jquery框架");
 		//载入vue支持
 		ZJCommon.pushScript('vue','js/common/vue.2.6.1.js','加载vue支持');	
+		//载入MD5支持
+		//ZJCommon.pushScript('md5','js/common/crypto/md5.js','加载md5支持');
 		//自动数据模型js文件
 		ZJCommon.pushScript(ZJCommon.url.fileNoSuffix+'dat',ZJCommon.url.filePath+'modle/'+ZJCommon.url.fileNoSuffix+'.js');	
-		//自动加载控制js文件
-		ZJCommon.pushScript(ZJCommon.url.fileNoSuffix+'Ctl',ZJCommon.url.filePath+'controller/'+ZJCommon.url.fileNoSuffix+'.js');
+		//自动加载控制js文件,确保数据模型文件载入完成再载入控制文件
+		(function a(l){
+			console.log(l);
+			if(!ZJCommon.jsArr.isInArrayByName(ZJCommon.url.fileNoSuffix+'dat')){
+			//l();
+			}
+			else{
+			 ZJCommon.pushScript(ZJCommon.url.fileNoSuffix+'Ctl',ZJCommon.url.filePath+'controller/'+ZJCommon.url.fileNoSuffix+'.js');
+			}			
+		})(a)
+		
+		
 		
 	});
 	},
@@ -341,8 +319,10 @@ var ZJCommon={
 
 }
 
-//初始化ZJCommon对象
+//初始化ZJCommon对象,
 ZJCommon.init();
+
+
 
 
 //------------------以下为对部分浏览器DOM对象的改造
