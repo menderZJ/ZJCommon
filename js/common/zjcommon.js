@@ -49,24 +49,36 @@ var ZJCommon={
 		setInterval(function(){ZJCommon.random=Math.random();},1);
 	}()),
 	/**
+	 * @method sleep
+	 * @description  阻塞式sleep，实现sleep、delay延迟运行后续代码的功能
+	 * @param {int} delay 延迟时间，毫秒
+	 * @return {null} null
+	 */
+	sleep:function (delay) {
+	  var start = (new Date()).getTime();
+		  while ((new Date()).getTime() - start < delay) {
+			continue;
+		  }
+	},
+	/**
 	 * @property {String} validate 验证类
 	 * @description 验证类
 	 */
 	validate:{
 		/**
 		 * @property {JSON} data待验证的数据，JSON
-		 * @description 待验证的数据，JSON格式，注意，验证时会根据key来寻找modul中对应key下的
-		 *              模型来对data.key的值进行验证,所以待验证数据的可用key请参照module的key,
+		 * @description 待验证的数据，JSON格式，注意，验证时会根据key来寻找model中对应key下的
+		 *              模型来对data.key的值进行验证,所以待验证数据的可用key请参照modele的key,
 		 * 				特别注意，如果有重复的键时，只匹配最后一个（JSON的成员中相同键只存储最后一个）。
 		 * @example
 		 *   {email,'abc@asd.com',mobile:'123456789',tel:0752-2289793'}}
 		 */
 		data:{},
 		/**
-		 * @property {JSON} modul验证模型，JSON
+		 * @property {JSON} model验证模型，JSON
 		 * @description 验证模型，JSON格式，默认加载日期，时间，邮件地址，手机号等常用验证模型
 		 */
-		modul:{
+		model:{
 			// YYYY-MM-DD格式
 			date: /^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/,
 			// Time
@@ -102,17 +114,17 @@ var ZJCommon={
 		 * @method validate 执行验证
 		 * @description  执行验证
 		 * @param {JSON}=data data 待验证的数据，不提供时直接使用validate.data数据
-		 * @param {JSON}=modul modul 自定义的验证类
+		 * @param {JSON}=model model 自定义的验证类
 		 * @return {JSON}={result:{Boolean}=[true|false],err:{json}} 返回验证结果,
 		 *          完全验证通过返回{result:true,err:{}},
 		 *          验证不通过时返回{result:false,err:第一条未通过的数据}
 		 */
-		validate:function(data,modul){
+		validate:function(data,model){
 		 data= data==undefined? this.data:data;
-		modul= modul==undefined? this.modul:modul;
+		model= model==undefined? this.model:model;
 		try{
 		for(var d in data){
-			if(!this.modul[d].test(data[d].toString())){return {result:false,err:data[d]};}
+			if(!this.model[d].test(data[d].toString())){return {result:false,err:data[d]};}
 			}
 		}
 		catch(e){			
@@ -158,6 +170,7 @@ var ZJCommon={
 		var jsDomObj=document.createElement('script');
 		jsDomObj.type='text/javascript';
 		jsDomObj.src=jsPath+"?"+Math.random();
+		jsDomObj.async=false;
 		if(this.jsArr.isInArrayByName(jsObj.name)) {return false;}			
 		jsDomObj.addEventListener('load',function(){
 		ZJCommon.jsArr.push(jsObj); //载入完成后将js文档信息压如ZJCommon.jsArr树	.
@@ -194,6 +207,7 @@ var ZJCommon={
 		CSSDomObj.type='text/css';
 		CSSDomObj.rel='stylesheet';		
 		CSSDomObj.href=CSSPath+"?"+Math.random();
+		CSSDomObj.async=false;
 		if(this.CSSArr.isInArrayByName(CSSObj.name)) {return false;}			
 		CSSDomObj.addEventListener('load',function(){
 		ZJCommon.CSSArr.push(CSSObj); //载入完成后将CSS文档信息压如ZJCommon.CSSArr树	.
@@ -219,6 +233,22 @@ var ZJCommon={
 	 if(msg!=undefined) alert(msg);
 	 ZJCommon.url.href=url;
 	},
+	
+	/**
+	 * @method load
+	 * @description  载入指定位置的HTML，替换当前页面的内容
+	 * @param {string} filePath html页面位置
+	 * @return {null}  返回get参数的JSON数据
+	 */	
+	loadHTML:function(filePath){
+	document.close();
+	$.get(filePath,{},function(d){
+		document.write(d);		
+	});
+		
+	},
+	
+	
 	/**
 	 * @method assemblyUrl
 	 * @description  根据相关参数拼装出前端mvc模式的URl地址
@@ -240,22 +270,11 @@ var ZJCommon={
 		//载入vue支持
 		ZJCommon.pushScript('vue','js/common/vue.2.6.1.js','加载vue支持');	
 		//载入MD5支持
-		//ZJCommon.pushScript('md5','js/common/crypto/md5.js','加载md5支持');
+		ZJCommon.pushScript('md5','js/common/crypto/md5.js','加载md5支持');
 		//自动数据模型js文件
-		ZJCommon.pushScript(ZJCommon.url.fileNoSuffix+'dat',ZJCommon.url.filePath+'modle/'+ZJCommon.url.fileNoSuffix+'.js');	
+		ZJCommon.pushScript(ZJCommon.url.fileNoSuffix+'dat',ZJCommon.url.filePath+'model/'+ZJCommon.url.fileNoSuffix+'.js');	
 		//自动加载控制js文件,确保数据模型文件载入完成再载入控制文件
-		(function a(l){
-			console.log(l);
-			if(!ZJCommon.jsArr.isInArrayByName(ZJCommon.url.fileNoSuffix+'dat')){
-			//l();
-			}
-			else{
-			 ZJCommon.pushScript(ZJCommon.url.fileNoSuffix+'Ctl',ZJCommon.url.filePath+'controller/'+ZJCommon.url.fileNoSuffix+'.js');
-			}			
-		})(a)
-		
-		
-		
+		ZJCommon.pushScript(ZJCommon.url.fileNoSuffix+'Ctl',ZJCommon.url.filePath+'controller/'+ZJCommon.url.fileNoSuffix+'.js');
 	});
 	},
 	
@@ -325,7 +344,7 @@ ZJCommon.init();
 
 
 
-//------------------以下为对部分浏览器DOM对象的改造
+//------------------以下为对浏览器部分DOM对象的扩展
 
 
 /**
@@ -391,5 +410,13 @@ Array.prototype.isInArrayByName=function(name){
 Array.prototype.getEleByName=function(name){
 	return this.getEleByKeyName('name',name);	
 }
-
-
+//产生自身的MD5散列hash
+String.prototype.md5=function (){
+	return md5(this);
+}
+//生成一些随机数
+String.prototype.randomStr8=function(){return md5((new Date()).getTime()+Math.random()).substr(1,8);}
+String.prototype.randomStr16=function(){return md5((new Date()).getTime()+Math.random()).substr(1,16);}
+String.prototype.randomStr32=function(){return md5((new Date()).getTime()+Math.random());}
+String.prototype.randomStr64=function(){return md5((new Date()).getTime()+Math.random())+md5((new Date()).getTime()+Math.random());}
+String.prototype.randomStr128=function(){return md5((new Date()).getTime()+Math.random())+md5((new Date()).getTime()+Math.random())+md5((new Date()).getTime()+Math.random())+md5((new Date()).getTime()+Math.random());}

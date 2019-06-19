@@ -1,16 +1,24 @@
 /**
  * @description 页面控制操作文件
  */
-var pageDO={
+var indexDo={
 	//填入页面基本信息	
 	//更新标题
-	updateTitle:(function(){
-		document.title = pageData.title;
-		}()),
-	updateKeywords:(function(){
-	//本来不想怎么使用jQuery,可是没办法，原生js选择器功能太low，而且既然Common中已经_autoload载入了，就用吧 ~_^
-	//console.log(window.jQuery);
-	//$("mata [name='keywords']").attr('content',pageData.keywords);
-	return "key"
-	}())
+	_init:function(){
+	//初始化页面基本信息也可在此函数里调用数据的处理过程
+	//这里将作为一个入口，自动加载相应的model
+	document.title = indexData.title;
+	$("meta[name='keywords']").attr("content",indexData.keywords);
+	$("meta[name='description']").attr("content",indexData.description);	
+	if(ZJCommon.url_params.l){
+		ZJCommon.loadHTML('view/'+ZJCommon.url_params.l+'.html');
+		ZJCommon.pushScript(ZJCommon.url_params.l+'dat','model/'+ZJCommon.url_params.l+'.js');
+		ZJCommon.pushScript(ZJCommon.url_params.l+'Ctl','controller/'+ZJCommon.url_params.l+'.js');
+	}	
+	
+
+	},
+	
+	
 }
+indexDo._init();
