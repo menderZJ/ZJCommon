@@ -8,8 +8,7 @@
 	
     <title>UnTitled</title>
 	<script src="js/common/zjcommon.js"></script>
-	<script type="text/javascript">
-    	
+	<script type="text/javascript">    	
    		document.addEventListener('plusready', function(){
    			//console.log("所有plus api都应该在此事件发生后调用，否则会出现plus is undefined。"
 			
@@ -18,20 +17,15 @@
    		});		
 		
 		//需要载入的js,css均在此处载入,特定的plus相关js文件请在document.plusready事件里载入
-	    window.addEventListener('load',function(){
-		//if(ZJCommon.jsArr.isInArrayByName('md5')){
-			// ZJCommon.radom.str8=md5(Math.random()).substr(1,8);
-			// ZJCommon.radom.str16=md5(Math.random()).substr(1,16);
-			// ZJCommon.radom.str32=md5(Math.random());
-			// ZJCommon.radom.str8 = md5(Math.random())+md5(Math.random());
-			// }
+	    window.addEventListener('load',function(){		
 		ZJCommon.pushCSS('index.red','css/index.red.css','加载css文件');//载入CSS样式文件
+		
 		})
    	 
-    </script>
-	
+    </script>	
 </head>
 <body>
+<!--可以开始进行设计了-->
 
 </body>
 </html>

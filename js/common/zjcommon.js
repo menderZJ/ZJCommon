@@ -49,6 +49,18 @@ var ZJCommon={
 		setInterval(function(){ZJCommon.random=Math.random();},1);
 	}()),
 	/**
+	 * @method sleep
+	 * @description  阻塞式sleep，实现sleep、delay延迟运行后续代码的功能
+	 * @param {int} delay 延迟时间，毫秒
+	 * @return {null} null
+	 */
+	sleep:function (delay) {
+	  var start = (new Date()).getTime();
+		  while ((new Date()).getTime() - start < delay) {
+			continue;
+		  }
+	},
+	/**
 	 * @property {String} validate 验证类
 	 * @description 验证类
 	 */
@@ -158,6 +170,7 @@ var ZJCommon={
 		var jsDomObj=document.createElement('script');
 		jsDomObj.type='text/javascript';
 		jsDomObj.src=jsPath+"?"+Math.random();
+		jsDomObj.async=false;
 		if(this.jsArr.isInArrayByName(jsObj.name)) {return false;}			
 		jsDomObj.addEventListener('load',function(){
 		ZJCommon.jsArr.push(jsObj); //载入完成后将js文档信息压如ZJCommon.jsArr树	.
@@ -194,6 +207,7 @@ var ZJCommon={
 		CSSDomObj.type='text/css';
 		CSSDomObj.rel='stylesheet';		
 		CSSDomObj.href=CSSPath+"?"+Math.random();
+		CSSDomObj.async=false;
 		if(this.CSSArr.isInArrayByName(CSSObj.name)) {return false;}			
 		CSSDomObj.addEventListener('load',function(){
 		ZJCommon.CSSArr.push(CSSObj); //载入完成后将CSS文档信息压如ZJCommon.CSSArr树	.
@@ -219,6 +233,22 @@ var ZJCommon={
 	 if(msg!=undefined) alert(msg);
 	 ZJCommon.url.href=url;
 	},
+	
+	/**
+	 * @method load
+	 * @description  载入指定位置的HTML，替换当前页面的内容
+	 * @param {string} filePath html页面位置
+	 * @return {null}  返回get参数的JSON数据
+	 */	
+	loadHTML:function(filePath){
+	document.close();
+	$.get(filePath,{},function(d){
+		document.write(d);		
+	});
+		
+	},
+	
+	
 	/**
 	 * @method assemblyUrl
 	 * @description  根据相关参数拼装出前端mvc模式的URl地址
@@ -240,22 +270,11 @@ var ZJCommon={
 		//载入vue支持
 		ZJCommon.pushScript('vue','js/common/vue.2.6.1.js','加载vue支持');	
 		//载入MD5支持
-		//ZJCommon.pushScript('md5','js/common/crypto/md5.js','加载md5支持');
+		ZJCommon.pushScript('md5','js/common/crypto/md5.js','加载md5支持');
 		//自动数据模型js文件
-		ZJCommon.pushScript(ZJCommon.url.fileNoSuffix+'dat',ZJCommon.url.filePath+'modle/'+ZJCommon.url.fileNoSuffix+'.js');	
+		ZJCommon.pushScript(ZJCommon.url.fileNoSuffix+'dat',ZJCommon.url.filePath+'model/'+ZJCommon.url.fileNoSuffix+'.js');	
 		//自动加载控制js文件,确保数据模型文件载入完成再载入控制文件
-		(function a(l){
-			console.log(l);
-			if(!ZJCommon.jsArr.isInArrayByName(ZJCommon.url.fileNoSuffix+'dat')){
-			//l();
-			}
-			else{
-			 ZJCommon.pushScript(ZJCommon.url.fileNoSuffix+'Ctl',ZJCommon.url.filePath+'controller/'+ZJCommon.url.fileNoSuffix+'.js');
-			}			
-		})(a)
-		
-		
-		
+		ZJCommon.pushScript(ZJCommon.url.fileNoSuffix+'Ctl',ZJCommon.url.filePath+'controller/'+ZJCommon.url.fileNoSuffix+'.js');
 	});
 	},
 	
@@ -391,5 +410,13 @@ Array.prototype.isInArrayByName=function(name){
 Array.prototype.getEleByName=function(name){
 	return this.getEleByKeyName('name',name);	
 }
-
-
+//产生自身的MD5散列hash
+String.prototype.md5=function (){
+	return md5(this);
+}
+//生成一些随机数
+String.prototype.randomStr8=function(){return md5((new Date()).getTime()+Math.random()).substr(1,8);}
+String.prototype.randomStr16=function(){return md5((new Date()).getTime()+Math.random()).substr(1,16);}
+String.prototype.randomStr32=function(){return md5((new Date()).getTime()+Math.random());}
+String.prototype.randomStr64=function(){return md5((new Date()).getTime()+Math.random())+md5((new Date()).getTime()+Math.random());}
+String.prototype.randomStr128=function(){return md5((new Date()).getTime()+Math.random())+md5((new Date()).getTime()+Math.random())+md5((new Date()).getTime()+Math.random())+md5((new Date()).getTime()+Math.random());}
