@@ -23,8 +23,9 @@ var indexDo={
 	}	
 	
 
-	},
+	}
 	
 	
+},
 }
 indexDo._init();
